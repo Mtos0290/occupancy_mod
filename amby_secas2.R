@@ -1,6 +1,5 @@
 ###################################################################################
 ## Analisis de ocupacion A. ordinarium 60 sitios temporada de secas             ###
-## analisis rems fecha: 28/01/2019                                              ###
 ###################################################################################
 
 R
@@ -12,7 +11,7 @@ library(usdm)
 library(corrplot)
 
 
-load("amby.secas2.RData")
+
 
 ###### Importacion y manipulacion de la base de datos###############
 
@@ -24,7 +23,7 @@ names(amby)
 
 ############estimacion de los promedios de variables#####
 
-amby$trans <- apply(amby[,45:46], 1, sum)
+amby$trans <- apply(amby[,45:46], 1, sum) ##proporci贸n de uso de suelo correspondiente a cultivos y pastizal inducido
 
 summary(amby$trans)
 
@@ -36,7 +35,7 @@ amby$mean_cond <-  apply(amby[,20:22], 1, mean)
 
 amby$mean_OD <-  apply(amby[,26:28], 1, mean)
 
-###historiales de detecci髇####
+###historiales de detecci贸n####
 
 amby.y <- amby[,2:4]
 
@@ -47,13 +46,13 @@ amby$lcond <- log(amby$mean_cond)
 
 names(amby)
 
-###########estandarizaci髇 de covariables#######
+###########estandarizaci贸n de covariables#######
 
 amby.cov <- data.frame(scale(amby[c(38,47:50,52,53)]))
 
 names(amby.cov)
 
-##########verificamos el grado de correlaci髇 de las variables consideradas####
+##########verificamos el grado de correlaci贸n de las variables consideradas####
 
 vif(amby.cov)
 
@@ -68,14 +67,14 @@ ambyUMF <- unmarkedFrameOccu(	y = amby.y, siteCovs = amby.cov)
 
 summary(ambyUMF)
 
-####gr醘icos de detecciones#####
+####gr谩ficos de detecciones#####
 
 plot(ambyUMF, col.regions = palette(gray(2:1/3)))
 
 
-############modelos de ocupaci髇 temporada de secas##################
+############modelos de ocupaci贸n temporada de secas##################
 
-########################vegetaci髇 nativa######################
+########################vegetaci贸n nativa######################
 
 psi.nat500_p. <- occu(~1 ~nat_500, data = ambyUMF)
 
@@ -126,7 +125,7 @@ psi.elev_2_p. <- occu(~1 ~ I(elev^2), data = ambyUMF)
 
 psi.pH_lcond_p. <- occu(~1 ~mean_ph + lcond, data = ambyUMF)
 
-#################selecci髇 modelos #######
+#################selecci贸n modelos #######
 ##############lista de modelos############
 
 
@@ -279,36 +278,7 @@ modavg(cand.set = Cand.models, parm = "(Intercept)", modnames = mod.names,
 
 #Model-averaged estimate: 0.85 
 #Unconditional SE: 0.38 
-#95% Unconditional confidence interval: 0.11, 1.58
-
-#>plogis(0.85)
-#[1] 0.70
-
-#> plogis(0.11)
-#[1] 0.52
-
-#> plogis(1.58)
-#[1] 0.83
-
-####valores estimados de p para ambas temporadas####
-
-names(x) <- c("Secas", "Lluvias")
-
-x <- c(0.7, 0.56)
-
-L <- c(0.52, 0.36)
-
-U <- c(0.83, 0.75)
-
-par(las=1, mar=c(5,5,2,2), mfrow = c(1,1))
-
-plotCI(x, ui = U, li = L, xlim = c(0.5,2.5),
-       ylim = c(0,.965), ylab = "Probabilidad de detecci髇 (p)",
-       xlab = "Temporada", las = 1, bty = "l", family = "serif",
-       cex.axis = 1.3, cex.lab = 1.5, xaxt = "n")
-
-axis(side=1, at =1:2, labels = names(x), cex=1.5, family = "serif")
-
+#95% Unconditional confidence interval: 0.11, 1.58 ##predictor confiable
 
 
 
@@ -317,21 +287,21 @@ modavg(cand.set = Cand.models, modnames = mod.names, second.ord = TRUE,
 
 #Model-averaged estimate: 0.92 
 #Unconditional SE: 0.49 
-#95% Unconditional confidence interval: -0.04, 1.89##predictor no confiable
+#95% Unconditional confidence interval: -0.04, 1.89 ##predictor no confiable
 
 modavg(cand.set = Cand.models, modnames = mod.names, second.ord = TRUE,
        parm = "elev", parm.type = "psi", c.hat = 1.29)
 
 #Model-averaged estimate: 1.96 
 #Unconditional SE: 0.84 
-#95% Unconditional confidence interval: 0.31, 3.61 #predictor confiable
+#95% Unconditional confidence interval: 0.31, 3.61 
 
 modavg(cand.set = Cand.models, modnames = mod.names, second.ord = TRUE,
        parm = "nat_500", parm.type = "psi", c.hat = 1.29)
 
 #Model-averaged estimate: -0.71 
 #Unconditional SE: 0.43 
-#95% Unconditional confidence interval: -1.54, 0.13 Predictor confiable
+#95% Unconditional confidence interval: -1.54, 0.13 
 
 modavg(cand.set = Cand.models, parm = "(Intercept)", modnames = mod.names,
        second.ord = TRUE, parm.type = "psi", c.hat = 1.29)
@@ -348,7 +318,7 @@ modavg(cand.set = Cand.models, parm = "(Intercept)", modnames = mod.names,
 #95% Unconditional confidence interval: 0.11, 1.58
 
 #######graficas de los valores predichos##########################
-########proporci髇 transformado a 500m #########
+########proporci贸n transformado a 500m #########
 
 modavg.trans_500 <- list(psi.trans500_lcond_p., psi.trans500_p. ,
                         psi.trans500_elev_p. , psi.trans500_pH_p., 
@@ -394,8 +364,8 @@ par(las=1, mar=c(5,6,2,2), mfrow = c(1,3))
 
 plot(trans.graf, avgtrans, type="l", ylim = c(0, 0.963), 
      cex.axis = 1.3, cex.lab = 1.5,  xlim = c(0, 0.963), family = "serif",
-     xlab="Proporci髇 terreno transformado 500m", las = 1,
-     ylab=expression(paste("Probabilidad de ocupaci髇 ( ", 
+     xlab="Proporci贸n terreno transformado 500m", las = 1,
+     ylab=expression(paste("Probabilidad de ocupaci贸n ( ", 
                            italic(hat(bar(psi))),")", sep="")), bty="l")
 
 text(0.5, 0.9, "A)", family = "serif", cex = 2.3)
@@ -403,7 +373,7 @@ text(0.5, 0.9, "A)", family = "serif", cex = 2.3)
 lines(trans.graf, aupper, lty=2)
 lines(trans.graf, alower, lty=2)
 
-####################valores predichos de vegetaci髇 nativa################
+####################valores predichos de vegetaci贸n nativa################
 
 modavg.nat <- list(psi.nat500_p., psi.nat500_temp_p. ,
                     psi.nat500_lcond_p., psi.nat500_pH_p. ,
@@ -428,7 +398,7 @@ prednat <- modavgPred(cand.set = modavg.nat, modnames = nameavg.nat,
                        c.hat = 1.29)
 
 
-##secuencia de datos vegetaci髇 nativa
+##secuencia de datos vegetaci贸n nativa
 nat.graf <- seq(min(amby$nat_500), max(amby$nat_500), length=100)
 
 
@@ -442,12 +412,12 @@ blower <- matxB[,"lower.CL"]
 
 bupper <- matxB[,"upper.CL"]
 
-####graficamos los valores predichos de vegetaci髇 nativa###
+####graficamos los valores predichos de vegetaci贸n nativa###
 
 
 plot(nat.graf, avgnat, type="l", ylim = c(0, 0.963), 
      cex.axis = 1.3, cex.lab = 1.5,  xlim = c(0.03,0.963), family = "serif",
-     xlab="Proporci髇 vegetaci髇 nativa 500m", las = 1, bty = "l",
+     xlab="Proporci贸n vegetaci贸n nativa 500m", las = 1, bty = "l",
      ylab="")
 
 text(0.5, 0.9, "B)", family = "serif", cex = 2.3)
@@ -457,7 +427,7 @@ lines(nat.graf, blower, lty=2)
 
 
 
-####################valores predichos de elevaci髇################
+####################valores predichos de elevaci贸n################
 
 modavg.elev <- list(psi.nat500_elev_p.  , psi.trans500_elev_p. ,
                     psi.elev_p.,
@@ -498,12 +468,12 @@ cupper <- matxC[,"upper.CL"]
 
 
 
-####graficamos los valores predichos de elevaci髇####
+####graficamos los valores predichos de elevaci贸n####
 
 
 plot(elev.graf, avgelev, type="l", ylim = c(0, 0.963), 
      cex.axis = 1.3, cex.lab = 1.5,  xlim = c(500,2910), family = "serif",
-     xlab="Elevaci髇 (m snm)", las = 1, bty = "l",
+     xlab="Elevaci贸n (m snm)", las = 1, bty = "l",
      ylab="")
 
 text(1800, 0.9, "C)", family = "serif", cex = 2.3)
@@ -514,10 +484,8 @@ lines(elev.graf, clower, lty=2)
 
 
 
-save.image("amby.secas2.RData")
 
-
-####Estimaciones de proporci髇 de 醨ea ocupada####
+####Estimaciones de proporci贸n de 谩rea ocupada####
 
 
 
@@ -638,7 +606,6 @@ Paoavgup <- ((0.45*0.34)+(0.45*0.13)+ (0.43*0.10)+(0.41*0.10)+(0.46*0.06)+(0.46*
                (0.4*0.02))
 #[1] 0.4185
 
-save.image("amby.secas2.RData")
 
 ##################grafica de predicciones a lo largo de dos gradientes######
 
@@ -654,14 +621,14 @@ nt <- scale(seq(min(amby$nat_500),
 
 
 
-#################covariables elevaci髇 y transformado##################
+#################covariables elevaci贸n y transformado##################
 
-pred.matrix1 <- array(NA, dim = c(50, 50))#especificaci髇 de la matriz y sus dimenciones
+pred.matrix1 <- array(NA, dim = c(50, 50))#especificaci贸n de la matriz y sus dimenciones
 for(i in 1:50){
   for(j in 1:50){
     newData <- data.frame(x=0, y=0, trans=ts[i], elev=ep[j], iLength=0)##ingreso de datos especificados para las predicciones conjuntas
     pred.matrix1[i,j] <- predict(psi.trans500_elev_p.,
-                                 type="state", newdata=newData)[1,1]##generaci髇 de las predicciones a partir del modelo
+                                 type="state", newdata=newData)[1,1]##generaci贸n de las predicciones a partir del modelo
   }
 }
 
@@ -673,8 +640,8 @@ mapPalette <- colorRampPalette(c("grey", "yellow", "orange", "red"))
 image(y=seq(0, 1, length.out = 50),
       x=seq(500, 3000, length.out = 50), family = "serif",
       z=pred.matrix1, col = mapPalette(50), axes = F,
-      xlab =  "Elevaci髇 (m snm)", 
-      ylab =  "Proporci髇 de terreno transformado")
+      xlab =  "Elevaci贸n (m snm)", 
+      ylab =  "Proporci贸n de terreno transformado")
 
 contour(y=seq(0, 1, length.out = 50),
         x=seq(500, 3000, length.out = 50),
@@ -696,14 +663,14 @@ points(amby$elev[amby$s2=="1"], amby$nat_500[amby$s2=="1"],
 points(amby$elev[amby$s1=="1"], amby$nat_500[amby$s1=="1"], 
        pch=19, cex=1.5, col = "black")
 
-#################covariables elevaci髇 y nativa##################
+#################covariables elevaci贸n y nativa##################
 
-pred.matrix2 <- array(NA, dim = c(50, 50))#especificaci髇 de la matriz y sus dimenciones
+pred.matrix2 <- array(NA, dim = c(50, 50))#especificaci贸n de la matriz y sus dimenciones
 for(i in 1:50){
   for(j in 1:50){
     newData <- data.frame(x=0, y=0, elev=ep[i], nat_500=nt[j], iLength=0)##ingreso de datos especificados para las predicciones conjuntas
     pred.matrix2[i,j] <- predict(psi.nat500_elev_p.,
-                                 type="state", newdata=newData)[1,1]##generaci髇 de las predicciones a partir del modelo
+                                 type="state", newdata=newData)[1,1]##generaci贸n de las predicciones a partir del modelo
   }
 }
 
@@ -712,8 +679,8 @@ for(i in 1:50){
 image(y=seq(0, 1, length.out = 50),
       x=seq(500, 3000, length.out = 50), family = "serif",
       z=pred.matrix2, col = mapPalette(50), axes = F,
-      xlab =  "Elevaci髇 (m snm)", 
-      ylab =  "Proporci髇 de vegetaci髇 nativa")
+      xlab =  "Elevaci贸n (m snm)", 
+      ylab =  "Proporci贸n de vegetaci贸n nativa")
 
 contour(y=seq(0, 1, length.out = 50),
         x=seq(500, 3000, length.out = 50),
@@ -735,6 +702,4 @@ points(amby$elev[amby$s2=="1"], amby$trans[amby$s2=="1"],
 points(amby$elev[amby$s1=="1"], amby$trans[amby$s1=="1"], 
        pch=19, cex=1.5)
 
-##################################
 
-save.image("amby.secas2.RData")
